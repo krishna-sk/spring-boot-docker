@@ -63,6 +63,25 @@ docker run --name spring_app --network spring-boot-network -p 8080:8080 -e SPRIN
 -e MYSQL_SERVER=mysql_container -d spring-boot-docker:1.0
 ```
 
+* curls to test app once started
+```
+curl --location 'http://localhost:8080/jobs'
+```
+
+```
+curl --location 'http://localhost:8080/jobs/create' \
+--header 'Content-Type: application/json' \
+--data '{
+    "profile": "Software Engineer",
+    "experience": "5 years"
+}'
+```
+
+```
+curl --location 'http://localhost:8080/jobs/1'
+
+```
+
 ## Docker Commands
 
 Docker commands are essential for managing your containers and images in this project.
