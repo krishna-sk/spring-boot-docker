@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  mysql_db:
+    image: mysql:latest
+    container_name: mysql_container
+    networks:
+      - spring_boot_mysql_network
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_password
+    volumes:
+      - /volume_docker/mysql:/var/lib/mysql
+
+  spring_boot_app:
+    image: spring-boot-docker:1.0
+    build:          # builds image if not present with above image name
+      context: .
+    container_name: spring_boot_app
+    networks:
+      - spring_boot_mysql_network
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/test
+      MYSQL_USERNAME: test_user
+      MYSQL_PASSWORD: test_password
+    depends_on:
+      - mysql_db
+
+networks:
+  spring_boot_mysql_network:
+    driver: bridge
+    name: spring_boot_mysql_network        # directory name will be prefixed for docker network name, so to avoid provided name key  will be
