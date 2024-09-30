@@ -1,6 +1,13 @@
+# Spring Boot Docker
+
+references
+
+- [docker](https://youtu.be/3c-iBn73dDE?feature=shared)
+- [docker-compose](https://youtu.be/SXwC9fSwct8?feature=shared)
+
 1. [Commands to start the Project](#Commands-to-start-the-Project)
-    1. [use docker run](#use-docker-run)
-    2. [use docker compose](#use-docker-compose)
+   1. [use docker run](#use-docker-run)
+   2. [use docker compose](#use-docker-compose)
 2. [Docker Commands](#Docker-Commands)
 3. [Docker networking](#Docker-networking)
 4. [Docker Compose](#Docker-compose)
@@ -9,36 +16,35 @@
 
 ### use docker compose
 
-* you can directly use docker-compose from the project root directory if you want
+- you can directly use docker-compose from the project root directory if you want
 
-``` 
-docker-compose up  
+```
+docker-compose up
 docker-compose down
 docker-compose start
 docker-compose stop
 ```
 
-* Use up to start everything from scratch.
-* Use down to stop and remove everything.
-* Use start to resume stopped containers.
-* Use stop to pause running containers without deleting them.
+- Use up to start everything from scratch.
+- Use down to stop and remove everything.
+- Use start to resume stopped containers.
+- Use stop to pause running containers without deleting them.
 
 ### use docker run
 
-* Create a docker image from the project root directory
+- Create a docker image from the project root directory
 
 ```
 docker build -t spring-boot-docker:1.0 .
 ```
 
-* Create network to run both spring boot app and mysql_container on same network so that they can communicate.
+- Create network to run both spring boot app and mysql_container on same network so that they can communicate.
 
 ```
  docker network create spring-boot-network
 ```
 
-* run the mysql image on spring-boot-network which we created above, port 3306 and provide root password for user root(
-  default root user) and create test_user
+- run the mysql image on spring-boot-network which we created above, on port 3306 and provide password for root user and create test_user
   and test_password and create db 'test' during container starting and mount the volume for persistence.
 
 ```
@@ -47,23 +53,24 @@ docker run --name mysql_container --network spring-boot-network -p3306:3306 -e M
 
 ```
 
-* run spring boot image spring-boot-network which we created above, port 8080 and provide spring.profiles.active which
+- run spring boot image spring-boot-network which we created above, port 8080 and provide spring.profiles.active which
   will pick prod config and mysql username and password
   and use spring.datasource.url as well,as url from provide in application-prod.yml is causing issues, might be
   environmental issues.
 
 ```
-docker run --name spring_app --network spring-boot-network -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod 
+docker run --name spring_app --network spring-boot-network -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod
 -e MYSQL_USERNAME=test_user -e MYSQL_PASSWORD=test_password
 -e SPRING_DATASOURCE_URL="jdbc:mysql://mysql_container:3306/test" -d spring-boot-docker:1.0
 
 // giving communication link failure error
-docker run --name spring_app --network spring-boot-network -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod 
+docker run --name spring_app --network spring-boot-network -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod
 -e MYSQL_USERNAME=test_user -e MYSQL_PASSWORD=test_password
 -e MYSQL_SERVER=mysql_container -d spring-boot-docker:1.0
 ```
 
-* curls to test app once started
+- curls to test app once started
+
 ```
 curl --location 'http://localhost:8080/jobs'
 ```
@@ -167,7 +174,7 @@ container's configuration, runtime status, network settings, and more.
 
 ## Docker networking
 
-* when you start docker containers without any network option from docker run command they are on default network
+- when you start docker containers without any network option from docker run command they are on default network
   provided by docker, and they can talk with host and each other on the same default network. inspect the container and
   get the ips and login to one pod and ping another pods ip, you
   are able to connect.
@@ -200,10 +207,10 @@ docker run --name app1 -p8080:8080 -d app:1.0
 docker run --name app2 -p8081:8080 -d app:1.0
 
 # get container ip => 172.17.0.2
-docker inspect app1 
+docker inspect app1
 
 # get container ip => 172.17.0.3
-docker inspect app2 
+docker inspect app2
 
 docker exec -it app1 bash
 ping 172.17.0.3
@@ -213,7 +220,7 @@ ping 172.17.0.2
 
 ```
 
-* you can create custom network add your containers to that network and so that they can communicate as well just like
+- you can create custom network add your containers to that network and so that they can communicate as well just like
   you started the project.
 
 ## Docker Compose
@@ -225,7 +232,7 @@ network name in docker compose file.
 
 docker-compose.yml
 
-``` 
+```
 version: "3.8"
 
 services:
@@ -244,9 +251,9 @@ services:
     volumes:
       - /volume_docker/mysql:/var/lib/mysql
 
-  spring_app:
+  spring_boot_app:
     image: spring-boot-docker:1.0
-    build:          # builds image if not present with above image name
+    build: # builds image if not present with above image name
       context: .
     container_name: spring_boot_app
     networks:
@@ -264,5 +271,5 @@ services:
 networks:
   spring_boot_mysql_network:
     driver: bridge
-    name: spring_boot_mysql_network        # directory name will be prefixed for docker network name, so to avoid provided name key  will be
+    name: spring_boot_mysql_network # directory name will be prefixed for docker network name, in order to avoid that, provided name key
 ```
