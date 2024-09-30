@@ -18,7 +18,7 @@ services:
 
   spring_boot_app:
     image: spring-boot-docker:1.0
-    build:          # builds image if not present with above image name
+    build: # builds image if not present with above image name
       context: .
     container_name: spring_boot_app
     networks:
@@ -36,4 +36,4 @@ services:
 networks:
   spring_boot_mysql_network:
     driver: bridge
-    name: spring_boot_mysql_network        # directory name will be prefixed for docker network name, so to avoid provided name key  will be
+    name: spring_boot_mysql_network # directory name will be prefixed for docker network name, in order to avoid that, provided name key
